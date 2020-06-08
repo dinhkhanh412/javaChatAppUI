@@ -1,19 +1,26 @@
 package Controller;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-
-import java.io.FileOutputStream;
+import javax.print.DocFlavor;
+import java.io.*;
 
 public class ReceiveThread implements Runnable {
 	private InputStream inputStream;
 	private BufferedReader bf;
 	private ChatClient client;
+	private LoginController loginController;
+	private ChatUIController chatUIController;
 	Message message = new Message();
 	String msg = "";
-	
+
+	public void setLoginController(LoginController loginController){
+		this.loginController = loginController;
+		loginController.setReceiver(this);
+	}
+
+	public void setChatUIController(ChatUIController chatUIController) {
+		this.chatUIController = chatUIController;
+	}
+
 	public ReceiveThread(InputStream in, ChatClient client) {
 		this.inputStream = in;
 		this.client = client;
@@ -73,6 +80,7 @@ public class ReceiveThread implements Runnable {
 					}
 					if (fileContent != null) message.createNew(msg, fileContent);
 					else message.createNew(msg);
+					System.out.println(message.getBody());
 					handleMsg(message);
 				}
 			} catch (IOException e) {
@@ -95,15 +103,55 @@ public class ReceiveThread implements Runnable {
 					this.client.loginSuccess();
 					this.client.setName(message.getReceiver());
 					System.out.println("Name: "+ this.client.getName());
+					try {
+						Reader inputString = new StringReader(message.getBody());
+						BufferedReader rd = new BufferedReader(inputString);
+						String line = rd.readLine();
+						if (line.equals("Online:")) {
+							while((line=rd.readLine()) != null) {
+								System.out.println("fr: " + line);
+								chatUIController.online(line);
+							}
+						}
+					} catch (IOException e) {
+						System.out.println("Not good");
+					}
+
 					System.out.println("New notification:\n" + message.getBody() + "From: " + msg.getSender()+ "\n");
-				} else {
+					return;
+				}
+				if (message.getCommand().equals("ONL")) {
+					Reader inputString = new StringReader(message.getBody());
+					BufferedReader rd = new BufferedReader(inputString);
+					try {
+						String line = rd.readLine();
+						chatUIController.online(line);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					return;
+				}
+				if (message.getCommand().equals("OFF")) {
+					Reader inputString = new StringReader(message.getBody());
+					BufferedReader rd = new BufferedReader(inputString);
+					try {
+						String line = rd.readLine();
+						chatUIController.offline(line);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					return;
+				}
+				if (message.getCommand().equals(("FAIL"))) {
 					client.reLoginRequest();
 					System.out.println(message.getBody() + "\n");
+					return;
 				}
 			}
 		}
 		else if (msg.getMethod().equals("RECV")) {
 			if (msg.getCommand().equals("MSG")){
+				chatUIController.receiveMess(message.getBody());
 				System.out.println("[" + message.getSender() + "]: " + message.getBody());
 				return;
 			}

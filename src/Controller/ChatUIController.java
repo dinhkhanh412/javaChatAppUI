@@ -24,6 +24,7 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -34,7 +35,10 @@ import java.io.IOException;
 
 
 public class ChatUIController extends ListView<String>  implements Runnable{
+    SendThread sender;
+    ReceiveThread receiver;
     String currentUser;
+    String currentReceiver;
     String message;
     String filePath;
     FileChooser fileChooser;
@@ -56,7 +60,7 @@ public class ChatUIController extends ListView<String>  implements Runnable{
 
     @FXML
     private JFXListView<String> onlineList;
-    ObservableList<String> listView = FXCollections.observableArrayList("Khanh", "Khanhdeptrai");//contant name on online user
+    ObservableList<String> listView = FXCollections.observableArrayList();//contant name on online user
 
     @FXML
     private Pane chatField;
@@ -88,9 +92,22 @@ public class ChatUIController extends ListView<String>  implements Runnable{
 
     //TODO: Update online list when a user online
     public void online(String user) {
+        if (listView.isEmpty()) {
+            currentReceiver = user;
+        }
         listView.add(user);
         onlineList.setItems(listView);
 
+    }
+
+    public void setSender(SendThread sender){
+        this.sender = sender;
+        this.sender.setChatUIController(this);
+    }
+
+    public void setReceiver(ReceiveThread receiver){
+        this.receiver = receiver;
+        this.receiver.setChatUIController(this);
     }
 
 
@@ -98,11 +115,11 @@ public class ChatUIController extends ListView<String>  implements Runnable{
     @FXML
     public void handleMouseClick(){
         String selectedUser = onlineList.getSelectionModel().getSelectedItem();
-        if (selectedUser == currentUser){
+        if (selectedUser == currentReceiver){
             System.out.println("Notthing change");
         }
         else {
-            currentUser = selectedUser;
+            currentReceiver = selectedUser;
             chatBox.getChildren().removeAll(chatBox.getChildren());
         }
     }
@@ -121,6 +138,16 @@ public class ChatUIController extends ListView<String>  implements Runnable{
     //TODO: Send message if message field not empty
     public void sendMess(){
         message = textField.getText();
+        String msg = "SEND MSG\n";
+        msg += this.sender.getClientName() + " " +currentReceiver+ "\n";
+        msg += "\n";
+        msg += message + "\n";
+        try {
+            sender.send(msg);
+            System.out.println(msg);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         if (!"".equals(message)){
             Text text = new Text(message);
             text.setFill(Color.WHITE);
@@ -145,7 +172,7 @@ public class ChatUIController extends ListView<String>  implements Runnable{
             chatField.layout();
             scrollPane.setVvalue(chatBox.getHeight());
 
-            receiveMess(message); //Test receive message UI
+            // receiveMess(message); //Test receive message UI
 
             //code to send message to server
 

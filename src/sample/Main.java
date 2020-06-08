@@ -17,26 +17,25 @@ import java.net.UnknownHostException;
 public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Thread chatClient;
-        String hostname = "192.168.20.135";
+        ChatClient chatClient;
+        String hostname = "localhost";
         int port = 8818;
         System.out.println("connecting");
 
         try {
-            Socket socket = new Socket(hostname, port);
-            System.out.println("connecting");
-            OutputStream outputStream = socket.getOutputStream();
-            InputStream inputStream = socket.getInputStream();
-
-            chatClient = new Thread(new ChatClient("", inputStream, outputStream, socket));
-            chatClient.start();
-
-
             FXMLLoader loader = new FXMLLoader(getClass().getResource("../FXML/Login.fxml"));
             Parent root = loader.load();
             primaryStage.setTitle("Login");
             LoginController loginController = loader.getController();
-            loginController.chatClient = chatClient;
+
+            Socket socket = new Socket(hostname, port);
+            OutputStream outputStream = socket.getOutputStream();
+            InputStream inputStream = socket.getInputStream();
+            chatClient = new ChatClient("", inputStream, outputStream, socket);
+            Thread chatClientThread = new Thread(chatClient);
+            chatClient.setLoginController(loginController);
+            chatClientThread.start();
+
             primaryStage.setScene(new Scene(root, 435, 545));
             primaryStage.show();
             primaryStage.setResizable(false);

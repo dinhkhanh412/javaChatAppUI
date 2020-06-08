@@ -1,5 +1,7 @@
 package Controller;
 
+
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
@@ -11,6 +13,8 @@ public class ChatClient implements Runnable {
 	private InputStream in;
 	private OutputStream out;
 	private Socket socket;
+	private LoginController loginController;
+	private ChatUIController chatUIController;
 	
 	class Control {
 		private volatile boolean loginStatus = false;
@@ -28,6 +32,13 @@ public class ChatClient implements Runnable {
 	}
 	
 	public String getName() { return name; }
+
+	public void setLoginController(LoginController loginController){
+		this.loginController = loginController;
+		this.loginController.setChatClient(this);
+	}
+
+
 	public Socket getSocket() { return socket; }
 	public InputStream getInputStream() { return in; }
 	public OutputStream getOutputStream() { return out; }
@@ -51,11 +62,20 @@ public class ChatClient implements Runnable {
 	public boolean hasDisconnected() {
 		return control.disconnect;
 	}
+
+	private SendThread send;
+	private ReceiveThread recv;
+
+	public SendThread getSend() { return send;}
+	public ReceiveThread getRecv() {return recv;}
+
 	@Override
 	public void run() {
-		SendThread send = new SendThread(out, this);
-		ReceiveThread recv = new ReceiveThread(in, this);
+		send = new SendThread(out, this);
+		recv = new ReceiveThread(in, this);
 
+		send.setLoginController(this.loginController);
+		recv.setLoginController(this.loginController);
 		Thread sender = new Thread(send);
 		Thread receiver = new Thread(recv);
 		sender.start();

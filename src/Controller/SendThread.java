@@ -1,5 +1,6 @@
 package Controller;
 
+
 import java.io.*;
 import java.util.Scanner;
 
@@ -10,17 +11,30 @@ public class SendThread implements Runnable {
 	private String msg = "";
 	private Scanner scn = new Scanner (System.in);
 	private String receiver = "";
-	
+	private LoginController loginController;
+	private ChatUIController chatUIController;
+
+	public void setLoginController(LoginController loginController){
+		this.loginController = loginController;
+		loginController.setSender(this);
+	}
+
+	public void setChatUIController(ChatUIController chatUIController) {
+		this.chatUIController = chatUIController;
+	}
+
 	public SendThread(OutputStream out, ChatClient client) {
 		this.outputStream = out;
 		this.client = client;
 	}
+
+	public String getClientName() {return this.client.getName();}
 	
 	public void run() {
-		loginRequest();
+		//loginRequest();
 		while (!client.isLogin()){
 			if (client.reLogin()) {
-				loginRequest();
+				//loginRequest();
 				client.reLoginDone();
 			}
 //			System.out.println("Loading...");
@@ -28,12 +42,18 @@ public class SendThread implements Runnable {
 		System.out.println("You can chat");
 		sendRequest();
 	}
+
+	public  void test(){
+		System.out.println("asd");
+	}
 	
 	public void send(String msg) throws IOException {
 		msg = "<start>\n" + msg + "\n<end>\n"; 
 		outputStream.write(msg.getBytes());
 	}
-	
+
+
+
 	public void sendFile(byte[] fileContent, String fileName, String receiver) throws IOException {
 		String header = "<start>\n"+"SEND FILE\n" + this.client.getName() + " " + receiver + "\n\n" + Integer.toString(fileContent.length) +  "\n" + fileName +"\n";
 		outputStream.write(header.getBytes());
@@ -143,14 +163,14 @@ public class SendThread implements Runnable {
 			System.out.println("Load file failure");
 		}		
 	}
-	public void loginRequest() {
-		Scanner scn = new Scanner(System.in);
-		System.out.println("===============LOGIN================");
-		System.out.print("Email: ");
-		String gmail = scn.nextLine();
-		System.out.print("Password: ");
-		String password =  scn.nextLine();
-		System.out.println("====================================");
+	public void loginRequest(String gmail, String password) {
+//		Scanner scn = new Scanner(System.in);
+//		System.out.println("===============LOGIN================");
+//		System.out.print("Email: ");
+//		String gmail = scn.nextLine();
+//		System.out.print("Password: ");
+//		String password =  scn.nextLine();
+//		System.out.println("====================================");
 		msg = "REQUEST LOGIN\n";
 		msg += this.client.getName() + " server\n";
 		msg += "\n";

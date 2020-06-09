@@ -164,13 +164,16 @@ public class ChatUIController extends ListView<String>  implements Runnable{
     //TODO: Send message if message field not empty
     public void sendMess(){
         message = textField.getText();
+        String recv;
         String msg = "";
         if (sendToGr == false) {
             msg = "SEND MSG\n";
+            recv = currentReceiver;
         } else {
             msg = "SEND GROUP\n";
+            recv = currentGr;
         }
-        msg += this.sender.getClientName() + " " +currentReceiver+ "\n";
+        msg += this.sender.getClientName() + " " +recv+ "\n";
         msg += "\n";
         msg += message + "\n";
         try {

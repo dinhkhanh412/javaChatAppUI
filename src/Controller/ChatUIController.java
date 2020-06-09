@@ -5,9 +5,13 @@ import com.jfoenix.controls.JFXTextField;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -17,8 +21,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
+import javafx.scene.text.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import java.io.File;
@@ -60,7 +63,8 @@ public class ChatUIController extends ListView<String>  implements Runnable{
 
     @FXML
     private JFXListView<String> onlineList;
-    ObservableList<String> listView = FXCollections.observableArrayList();//contant name on online user
+
+    public ObservableList<String> listView = FXCollections.observableArrayList();//contant name on online user
 
     @FXML
     private Pane chatField;
@@ -95,9 +99,9 @@ public class ChatUIController extends ListView<String>  implements Runnable{
         if (listView.isEmpty()) {
             currentReceiver = user;
         }
+
         listView.add(user);
         onlineList.setItems(listView);
-
     }
 
     public void setSender(SendThread sender){
@@ -151,6 +155,7 @@ public class ChatUIController extends ListView<String>  implements Runnable{
         if (!"".equals(message)){
             Text text = new Text(message);
             text.setFill(Color.WHITE);
+            text.setFont(Font.font("verdana", FontWeight.MEDIUM, FontPosture.REGULAR, 16));
             text.getStyleClass().add("message" + "\n");
             TextFlow tempFlow = new TextFlow();
 
@@ -187,7 +192,8 @@ public class ChatUIController extends ListView<String>  implements Runnable{
     public void receiveMess(String mess){
         Text text = new Text(mess);
         text.setFill(Color.WHITE);
-        text.getStyleClass().add("message" + "\n");
+        text.setFont(Font.font("verdana", FontWeight.MEDIUM, FontPosture.REGULAR, 16));
+        text.getStyleClass().add("message");
         TextFlow tempFlow = new TextFlow();
 
         tempFlow.getChildren().add(text);
@@ -230,4 +236,15 @@ public class ChatUIController extends ListView<String>  implements Runnable{
 
     }
 
+    public void addGroup(ActionEvent actionEvent) throws IOException {
+        Stage addGroup = new Stage();
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("../FXML/addGroup.fxml"));
+        Parent root = loader.load();
+        AddGroupController addGroupController = loader.getController();
+        addGroupController.getOnlineList(listView);
+        Scene scene = new Scene(root);
+        addGroup.setScene(scene);
+        addGroup.show();
+        addGroup.setResizable(false);
+    }
 }

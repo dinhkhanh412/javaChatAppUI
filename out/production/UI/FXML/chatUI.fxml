@@ -23,14 +23,14 @@
                   <Font name="Segoe UI Bold" size="20.0" />
                </font>
             </Label>
-            <JFXButton fx:id="addGroupBut" layoutX="198.0" layoutY="1.0" prefHeight="35.0" prefWidth="121.0" style="-fx-background-color: #316BF3;" text="Add Group" textFill="WHITE">
+            <JFXButton fx:id="addGroupBut" layoutX="198.0" layoutY="1.0" onAction="#addGroup" prefHeight="35.0" prefWidth="121.0" style="-fx-background-color: #316BF3;" text="Add Group" textFill="WHITE">
                <font>
                   <Font name="Segoe UI Bold" size="18.0" />
                </font>
             </JFXButton>
             <Label fx:id="NameOfUser" layoutX="16.0" layoutY="37.0" prefHeight="30.0" prefWidth="276.0" text="User Name" textFill="#2ca3e5">
                <font>
-                  <Font size="16.0" />
+                  <Font size="20.0" />
                </font>
             </Label>
          </children></Pane>

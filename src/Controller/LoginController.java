@@ -80,7 +80,6 @@ public class LoginController implements Initializable{
         } else {
             invalidLable.setVisible(true);
         }
-
     }
 
     public void setSender(SendThread sender){

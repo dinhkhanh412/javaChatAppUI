@@ -1,7 +1,7 @@
 #chatField .label{
   -fx-background-color:purple;
   -fx-text-fill:white;
-  -fx-font-size:15;
+  -fx-font-size:20;
   -fx-pref-height:20px;
   -fx-pref-width:200px;
   -fx-max-width:200px;
@@ -36,7 +36,7 @@
 
 .hbox{
     -fx-background-insets: 15;
-    -fx-padding: 12px;
+    -fx-padding: 15px;
 }
 
 .list-view .list-cell{

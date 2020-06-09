@@ -82,6 +82,7 @@ public class ReceiveThread implements Runnable {
 					else message.createNew(msg);
 					System.out.println(message.getBody());
 					handleMsg(message);
+					System.out.println("ASJGDJASD============" + message.getCommand());
 				}
 			} catch (IOException e) {
 				client.disconnect();

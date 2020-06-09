@@ -44,7 +44,9 @@ public class ChatUIController extends ListView<String>  implements Runnable{
     String currentReceiver;
     String message;
     String filePath;
+    String currentGr;
     FileChooser fileChooser;
+    boolean sendToGr = false;
 
     @FXML
     public Label NameOfUser;
@@ -121,13 +123,29 @@ public class ChatUIController extends ListView<String>  implements Runnable{
 
     //TODO: Click to chat with other user
     @FXML
-    public void handleMouseClick(){
+    public void handleMouseClickUser(){
         String selectedUser = onlineList.getSelectionModel().getSelectedItem();
+
+        sendToGr = false;
         if (selectedUser == currentReceiver){
             System.out.println("Notthing change");
         }
         else {
             currentReceiver = selectedUser;
+            chatBox.getChildren().removeAll(chatBox.getChildren());
+        }
+    }
+
+    //TODO: Click to chat with other user
+    @FXML
+    public void handleMouseClickGroup(){
+        sendToGr = true;
+        String selectedGr = groupList.getSelectionModel().getSelectedItem();
+        if (selectedGr == currentGr){
+            System.out.println("Notthing change");
+        }
+        else {
+            currentGr = selectedGr;
             chatBox.getChildren().removeAll(chatBox.getChildren());
         }
     }
@@ -146,7 +164,12 @@ public class ChatUIController extends ListView<String>  implements Runnable{
     //TODO: Send message if message field not empty
     public void sendMess(){
         message = textField.getText();
-        String msg = "SEND MSG\n";
+        String msg = "";
+        if (sendToGr == false) {
+            msg = "SEND MSG\n";
+        } else {
+            msg = "SEND GROUP\n";
+        }
         msg += this.sender.getClientName() + " " +currentReceiver+ "\n";
         msg += "\n";
         msg += message + "\n";
@@ -255,7 +278,11 @@ public class ChatUIController extends ListView<String>  implements Runnable{
     }
 
     public void newGr(String groupName){
+        if (!groupListView.isEmpty()){
+            currentGr = groupName;
+        }
         groupListView.add(groupName);
         groupList.setItems(groupListView);
+
     }
 }

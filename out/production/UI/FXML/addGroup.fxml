@@ -16,7 +16,7 @@
                   <Font size="16.0" />
                </font>
             </JFXTextField>
-            <JFXButton fx:id="button" layoutX="152.0" layoutY="290.0" prefHeight="39.0" prefWidth="95.0" style="-fx-background-color: #17A6FF;" text="Create" textFill="#f8f6f6">
+            <JFXButton fx:id="button" layoutX="152.0" layoutY="290.0" onAction="#create" prefHeight="39.0" prefWidth="95.0" style="-fx-background-color: #17A6FF;" text="Create" textFill="#f8f6f6">
                <font>
                   <Font size="16.0" />
                </font>

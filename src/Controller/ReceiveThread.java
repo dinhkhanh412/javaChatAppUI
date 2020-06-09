@@ -142,6 +142,17 @@ public class ReceiveThread implements Runnable {
 					}
 					return;
 				}
+				if (message.getCommand().equals("NEW_GR")) {
+					Reader inputString = new StringReader(message.getBody());
+					BufferedReader rd = new BufferedReader(inputString);
+					try {
+						String line = rd.readLine();
+						chatUIController.newGr(line);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					return;
+				}
 				if (message.getCommand().equals(("FAIL"))) {
 					client.reLoginRequest();
 					System.out.println(message.getBody() + "\n");

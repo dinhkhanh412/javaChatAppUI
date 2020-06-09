@@ -9,6 +9,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import org.controlsfx.control.CheckComboBox;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -21,6 +22,9 @@ public class AddGroupController implements Initializable {
 
     @FXML
     private JFXButton button;
+    private ChatClient chatClient;
+    private SendThread sender;
+    private ChatUIController chatUIController;
 
     //private ObservableList<String> onlineList = FXCollections.observableArrayList("khanh", "dat", "jaanh");
 
@@ -36,5 +40,27 @@ public class AddGroupController implements Initializable {
 
     //TODO: add group button click event
     public void create(ActionEvent actionEvent) {
+        String grName = groupName.getText();
+        ObservableList memList = addList.getCheckModel().getCheckedItems();
+
+        String memName = "";
+        for (Object obj : memList ) {
+            memName += obj.toString() + "\n";
+        }
+        if (memName != "") {
+            sender.requestNewGroup(grName, memName);
+            chatUIController.newGr(grName);
+        }
+        return;
+    }
+
+    public void setChatClient(ChatClient chatClient) {
+        this.chatClient = chatClient;
+    }
+    public void setSender(SendThread sender) {
+        this.sender = sender;
+    }
+    public void setChatUIController(ChatUIController chatUIController) {
+        this.chatUIController = chatUIController;
     }
 }

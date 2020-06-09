@@ -111,9 +111,7 @@ public class SendThread implements Runnable {
 		return;
 	}
 
-	private void requestNewGroup(String name, String member) {
-		name = "group1";
-		member = "tandat\ndat";
+	public void requestNewGroup(String name, String member) {
 		String msg = "REQUEST CREATE_GR\n" + this.client.getName() + " server\n\n"+ name + "\n" + member + "\n";
 		try {
 			send(msg);

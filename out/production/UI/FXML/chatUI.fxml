@@ -17,7 +17,7 @@
    <children>
       <Pane prefHeight="700.0" prefWidth="322.0" style="-fx-background-color: #2D3447;">
          <children>
-            <JFXListView fx:id="onlineList" layoutY="76.0" onMouseClicked="#handleMouseClick" prefHeight="625.0" prefWidth="322.0" style="-fx-background-color: #2D3459;" />
+            <JFXListView fx:id="onlineList" layoutY="97.0" onMouseClicked="#handleMouseClick" prefHeight="262.0" prefWidth="322.0" style="-fx-background-color: #2D3459;" />
             <Label layoutX="16.0" layoutY="-1.0" prefHeight="38.0" prefWidth="109.0" text="CHAT APP" textFill="WHITE">
                <font>
                   <Font name="Segoe UI Bold" size="20.0" />
@@ -31,6 +31,17 @@
             <Label fx:id="NameOfUser" layoutX="16.0" layoutY="37.0" prefHeight="30.0" prefWidth="276.0" text="User Name" textFill="#2ca3e5">
                <font>
                   <Font size="20.0" />
+               </font>
+            </Label>
+            <JFXListView fx:id="groupList" layoutY="385.0" onMouseClicked="#handleMouseClick" prefHeight="315.0" prefWidth="322.0" style="-fx-background-color: #2D3459;" />
+            <Label layoutX="14.0" layoutY="76.0" prefHeight="21.0" prefWidth="109.0" text="Online User:" textFill="#2fea39">
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </Label>
+            <Label layoutX="14.0" layoutY="364.0" prefHeight="21.0" prefWidth="109.0" text="Group:" textFill="#2fea39">
+               <font>
+                  <Font size="15.0" />
                </font>
             </Label>
          </children></Pane>

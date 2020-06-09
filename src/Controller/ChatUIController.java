@@ -75,6 +75,10 @@ public class ChatUIController extends ListView<String>  implements Runnable{
     @FXML
     private ScrollPane scrollPane;
 
+    @FXML
+    private JFXListView<String> groupList;
+    public ObservableList<String> groupListView = FXCollections.observableArrayList();//contant group
+
     private List<Label> messagesList = new ArrayList<>();
     private int index = 0;
 
@@ -241,10 +245,17 @@ public class ChatUIController extends ListView<String>  implements Runnable{
         FXMLLoader loader = new FXMLLoader(getClass().getResource("../FXML/addGroup.fxml"));
         Parent root = loader.load();
         AddGroupController addGroupController = loader.getController();
+        addGroupController.setSender(sender);
+        addGroupController.setChatUIController(this);
         addGroupController.getOnlineList(listView);
         Scene scene = new Scene(root);
         addGroup.setScene(scene);
         addGroup.show();
         addGroup.setResizable(false);
+    }
+
+    public void newGr(String groupName){
+        groupListView.add(groupName);
+        groupList.setItems(groupListView);
     }
 }

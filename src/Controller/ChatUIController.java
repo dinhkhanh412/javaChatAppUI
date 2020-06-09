@@ -10,6 +10,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
+import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -97,6 +98,15 @@ public class ChatUIController extends ListView<String>  implements Runnable{
             currentUser = listView.get(0);
         }
         onlineList.setItems(listView);
+        scrollPane.setContent(chatBox);
+    }
+
+    public void initGroupList(){
+        //Depend on what server send back
+        if (!groupListView.isEmpty()){
+            currentGr = groupListView.get(0);
+        }
+        groupList.setItems(groupListView);
         scrollPane.setContent(chatBox);
     }
 
@@ -281,9 +291,10 @@ public class ChatUIController extends ListView<String>  implements Runnable{
     }
 
     public void newGr(String groupName){
-        if (!groupListView.isEmpty()){
+        if (groupListView.isEmpty()) {
             currentGr = groupName;
         }
+
         groupListView.add(groupName);
         groupList.setItems(groupListView);
 

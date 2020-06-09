@@ -43,6 +43,8 @@ public class AddGroupController implements Initializable {
         String grName = groupName.getText();
         ObservableList memList = addList.getCheckModel().getCheckedItems();
 
+        if (memList == null) return;
+
         String memName = "";
         for (Object obj : memList ) {
             memName += obj.toString() + "\n";

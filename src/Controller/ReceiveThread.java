@@ -146,6 +146,7 @@ public class ReceiveThread implements Runnable {
 					Reader inputString = new StringReader(message.getBody());
 					BufferedReader rd = new BufferedReader(inputString);
 					try {
+						System.out.println("fkhasdfajsjdfla===============================");
 						String line = rd.readLine();
 						chatUIController.newGr(line);
 					} catch (IOException e) {

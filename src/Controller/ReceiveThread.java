@@ -80,9 +80,8 @@ public class ReceiveThread implements Runnable {
 					}
 					if (fileContent != null) message.createNew(msg, fileContent);
 					else message.createNew(msg);
-					System.out.println(message.getBody());
+//					System.out.println(message.getBody());
 					handleMsg(message);
-					System.out.println("ASJGDJASD============" + message.getCommand());
 				}
 			} catch (IOException e) {
 				client.disconnect();
@@ -103,14 +102,14 @@ public class ReceiveThread implements Runnable {
 				if (message.getCommand().equals("200")) {
 					this.client.loginSuccess();
 					this.client.setName(message.getReceiver());
-					System.out.println("Name: "+ this.client.getName());
+//					System.out.println("Name: "+ this.client.getName());
 					try {
 						Reader inputString = new StringReader(message.getBody());
 						BufferedReader rd = new BufferedReader(inputString);
 						String line = rd.readLine();
 						if (line.equals("Online:")) {
 							while((line=rd.readLine()) != null) {
-								System.out.println("fr: " + line);
+//								System.out.println("fr: " + line);
 								chatUIController.online(line);
 							}
 						}
@@ -118,7 +117,7 @@ public class ReceiveThread implements Runnable {
 						System.out.println("Not good");
 					}
 
-					System.out.println("New notification:\n" + message.getBody() + "From: " + msg.getSender()+ "\n");
+//					System.out.println("New notification:\n" + message.getBody() + "From: " + msg.getSender()+ "\n");
 					return;
 				}
 				if (message.getCommand().equals("ONL")) {
@@ -147,7 +146,6 @@ public class ReceiveThread implements Runnable {
 					Reader inputString = new StringReader(message.getBody());
 					BufferedReader rd = new BufferedReader(inputString);
 					try {
-						System.out.println("fkhasdfajsjdfla===============================");
 						String line = rd.readLine();
 						chatUIController.newGr(line);
 					} catch (IOException e) {
@@ -157,20 +155,20 @@ public class ReceiveThread implements Runnable {
 				}
 				if (message.getCommand().equals(("FAIL"))) {
 					client.reLoginRequest();
-					System.out.println(message.getBody() + "\n");
+//					System.out.println(message.getBody() + "\n");
 					return;
 				}
 			}
 		}
 		else if (msg.getMethod().equals("RECV")) {
 			if (msg.getCommand().equals("MSG")){
-				chatUIController.receiveMess(message.getBody());
-				System.out.println("[" + message.getSender() + "]: " + message.getBody());
+				chatUIController.receiveMess(message.getBody(), message.getSender(), false);
+//				System.out.println("[" + message.getSender() + "]: " + message.getBody());
 				return;
 			}
 			if (msg.getCommand().equals("GROUP")) {
-				chatUIController.receiveMess(message.getSender() + ": " + message.getBody());
-				System.out.println("[" + message.getSender() + " to " + message.getReceiver() + "]: " + message.getBody());
+				chatUIController.receiveMess(message.getSender() + ": " + message.getBody(), message.getReceiver(), true);
+//				System.out.println("[" + message.getSender() + " to " + message.getReceiver() + "]: " + message.getBody());
 				return;
 			}
 			if (msg.getCommand().equals("FILE")){

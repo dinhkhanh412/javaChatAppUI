@@ -48,6 +48,9 @@ public class ChatUIController extends ListView<String>  implements Runnable{
     String currentGr;
     FileChooser fileChooser;
     boolean sendToGr = false;
+    public ArrayList<ChatDialog> chatDialogs = new ArrayList<ChatDialog>();
+    public ChatDialog currentDialog = null;
+    public ChatDialog currentGrDialog;
 
     @FXML
     public Label NameOfUser;
@@ -112,11 +115,14 @@ public class ChatUIController extends ListView<String>  implements Runnable{
 
     //TODO: Update online list when a user online
     public void online(String user) {
+        listView.add(user);
+        ChatDialog newChatDialog = new ChatDialog();
+        newChatDialog.setFriendName(user);
+        chatDialogs.add(newChatDialog);
         if (listView.isEmpty()) {
             currentReceiver = user;
+            currentDialog = newChatDialog;
         }
-
-        listView.add(user);
         onlineList.setItems(listView);
     }
 
@@ -134,15 +140,28 @@ public class ChatUIController extends ListView<String>  implements Runnable{
     //TODO: Click to chat with other user
     @FXML
     public void handleMouseClickUser(){
-        String selectedUser = onlineList.getSelectionModel().getSelectedItem();
-
         sendToGr = false;
-        if (selectedUser == currentReceiver){
-            System.out.println("Notthing change");
+        String selectedUser = onlineList.getSelectionModel().getSelectedItem();
+        for (ChatDialog chatDialog : chatDialogs) {
+            if (chatDialog.getName().equals(selectedUser) && !chatDialog.isGroup()) {
+                currentDialog = chatDialog;
+                break;
+            }
         }
-        else {
-            currentReceiver = selectedUser;
-            chatBox.getChildren().removeAll(chatBox.getChildren());
+        chatBox.getChildren().removeAll(chatBox.getChildren());
+        currentReceiver = selectedUser;
+        for (ChatDialog chatDialog : chatDialogs) {
+            if (chatDialog.equals(currentDialog)) {
+                for (ChatMessage chatMessage :  chatDialog.getChatHistory()) {
+                    if (chatMessage.getSender().equals(NameOfUser.getText())) {
+                        UISend(chatMessage.getContent());
+                    } else {
+                        UIrececive(chatMessage.getContent());
+                    }
+                    System.out.println(chatMessage.getContent());
+                }
+                return;
+            }
         }
     }
 
@@ -151,12 +170,25 @@ public class ChatUIController extends ListView<String>  implements Runnable{
     public void handleMouseClickGroup(){
         sendToGr = true;
         String selectedGr = groupList.getSelectionModel().getSelectedItem();
-        if (selectedGr == currentGr){
-            System.out.println("Notthing change");
+        currentGr = selectedGr;
+        chatBox.getChildren().removeAll(chatBox.getChildren());
+        for (ChatDialog chatDialog : chatDialogs) {
+            if (chatDialog.getName().equals(currentGr) && chatDialog.isGroup) {
+                currentDialog = chatDialog;
+                break;
+            }
         }
-        else {
-            currentGr = selectedGr;
-            chatBox.getChildren().removeAll(chatBox.getChildren());
+        for (ChatDialog chatDialog : chatDialogs) {
+            if (chatDialog.equals(currentDialog)) {
+                for (ChatMessage chatMessage :  chatDialog.getChatHistory()) {
+                    if (chatMessage.getSender().equals(NameOfUser.getText())) {
+                        UISend(chatMessage.getContent());
+                    } else {
+                        UIrececive(chatMessage.getContent());
+                    }
+                }
+                return;
+            }
         }
     }
 
@@ -172,26 +204,8 @@ public class ChatUIController extends ListView<String>  implements Runnable{
     }
 
     //TODO: Send message if message field not empty
-    public void sendMess(){
-        message = textField.getText();
-        String recv;
-        String msg = "";
-        if (sendToGr == false) {
-            msg = "SEND MSG\n";
-            recv = currentReceiver;
-        } else {
-            msg = "SEND GROUP\n";
-            recv = currentGr;
-        }
-        msg += this.sender.getClientName() + " " +recv+ "\n";
-        msg += "\n";
-        msg += message + "\n";
-        try {
-            sender.send(msg);
-            System.out.println(msg);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
+    public void UISend(String message) {
         if (!"".equals(message)){
             Text text = new Text(message);
             text.setFill(Color.WHITE);
@@ -204,7 +218,7 @@ public class ChatUIController extends ListView<String>  implements Runnable{
 
 
             TextFlow flow=new TextFlow(tempFlow);
-            HBox hbox=new HBox(12);
+            HBox hbox= new HBox(12);
 
             tempFlow.getStyleClass().add("tempFlow");
             flow.getStyleClass().add("textFlow");
@@ -225,11 +239,35 @@ public class ChatUIController extends ListView<String>  implements Runnable{
         else {
             System.out.println("null message");//Use to check emty, delete it
         }
+    }
+    public void sendMess(){
+        message = textField.getText();
+        String recv;
+        String msg = "";
+        if (sendToGr == false) {
+            msg = "SEND MSG\n";
+            recv = currentReceiver;
+        } else {
+            msg = "SEND GROUP\n";
+            recv = currentGr;
+        }
+        msg += this.sender.getClientName() + " " +recv+ "\n";
+        msg += "\n";
+        msg += message + "\n";
+        try {
+            sender.send(msg);
+            System.out.println(msg);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        UISend(message);
+        System.out.println(currentDialog.getName());
+        currentDialog.addMess(NameOfUser.getText(), message);
         textField.setText("");//set message field
     }
 
     //TODO: Receive and message and update chatbox
-    public void receiveMess(String mess){
+    public void UIrececive(String mess) {
         Text text = new Text(mess);
         text.setFill(Color.WHITE);
         text.setFont(Font.font("verdana", FontWeight.MEDIUM, FontPosture.REGULAR, 16));
@@ -253,6 +291,16 @@ public class ChatUIController extends ListView<String>  implements Runnable{
 
         chatField.layout();
         scrollPane.setVvalue(chatBox.getHeight());
+    }
+    public void receiveMess(String mess, String person, boolean isGroup){
+        for (ChatDialog chatDialog : chatDialogs) {
+            if (chatDialog.getName().equals(person)) {
+                chatDialog.addMess(person, mess);
+                if (chatDialog.equals(currentDialog)) {
+                    UIrececive(mess);
+                }
+            }
+        }
     }
 
     //TODO: Get file name and file path to send
@@ -294,9 +342,14 @@ public class ChatUIController extends ListView<String>  implements Runnable{
         if (groupListView.isEmpty()) {
             currentGr = groupName;
         }
-
         groupListView.add(groupName);
         groupList.setItems(groupListView);
-
+        ChatDialog newChatDialog = new ChatDialog();
+        newChatDialog.setFriendName(groupName);
+        newChatDialog.setGroup();
+        chatDialogs.add(newChatDialog);
+        if (currentDialog == null) {
+            currentDialog = chatDialogs.get(0);
+        }
     }
 }

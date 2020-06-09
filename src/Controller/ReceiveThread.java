@@ -169,7 +169,7 @@ public class ReceiveThread implements Runnable {
 				return;
 			}
 			if (msg.getCommand().equals("GROUP")) {
-				chatUIController.receiveMess(message.getBody());
+				chatUIController.receiveMess(message.getSender() + ": " + message.getBody());
 				System.out.println("[" + message.getSender() + " to " + message.getReceiver() + "]: " + message.getBody());
 				return;
 			}

@@ -1,5 +1,4 @@
 package Controller;
-
 //<start>
 //<METHOD> <COMMAND>
 //<sender> <receiver>
@@ -8,9 +7,9 @@ package Controller;
 //<end>
 
 // METHOD:
-//		REQUEST: 
+//		REQUEST:
 //			CMD: LOGIN, LOGOUT
-//		SEND: 
+//		SEND:
 //			 CMD: MSG, GROUP
 //		RECV:
 //			CMD: MSG, FILE
@@ -19,7 +18,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 public class Message {
-	
+
 	private String msg;
 	private String method;
 	private String cmd;
@@ -27,7 +26,7 @@ public class Message {
 	private String receiver;
 	private String body = "";
 	private byte[] fileContent = null;
-	
+
 	public Message() {
 		msg = "";
 		method = "";
@@ -36,11 +35,21 @@ public class Message {
 		receiver = "";
 		body = "";
 	}
+
+	public Message(Message message) {
+		cmd = message.getCommand();
+		method = message.getMethod();
+		sender = message.getSender();
+		receiver = message.getReceiver();
+		body = message.getBody();
+		fileContent = message.getFileContent();
+	}
+
 	public Message(String s) {
 		this.msg = s;
 		init();
 	}
-	
+
 	public void createNew(String msg) {
 		this.msg = msg;
 		init();
@@ -51,7 +60,7 @@ public class Message {
 		init();
 		this.fileContent = fileContent;
 	}
-	
+
 	public void init() {
 		String[] lines = msg.split("\n");
 		if (lines.length < 3) return;
@@ -65,27 +74,27 @@ public class Message {
 			body += lines[i] + '\n';
 		}
 	}
-	
+
 	public String getMethod() { return this.method; }
-	
+
 	public String getCommand() { return this.cmd; }
-	
+
 	public String getSender() {return this.sender; }
-	
+
 	public String getReceiver() {return this.receiver; }
-	
+
 	public String getBody() { return this.body; }
-	
+
 	public void setReceiveMethod() {
 		this.method = "RECV";
 	}
 
 	public byte[] getFileContent() {return this.fileContent;}
-	
+
 	public boolean good() {
-		return method != "" && cmd != "" && sender != "" && receiver != ""; 
+		return method != "" && cmd != "" && sender != "" && receiver != "";
 	}
-	
+
 	public void clear() {
 		msg = "";
 		method = "";
@@ -94,7 +103,7 @@ public class Message {
 		receiver = "";
 		body = "";
 	}
-	
+
 	public String toText() {
 		String text = "";
 		text += "<start>\n";
@@ -102,7 +111,7 @@ public class Message {
 		text +=  sender + " " + receiver + "\n";
 		text += "\n";
 		text += body + "\n";
-		text += "<end>\n";
+		text += "<end>\n\0";
 		return text;
 	}
 
@@ -114,11 +123,12 @@ public class Message {
 		text += "\n";
 		text += body + "\n";
 		byte[] header = text.getBytes();
+		System.out.println(fileContent.length);
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		try {
 			outputStream.write(text.getBytes());
 			outputStream.write(fileContent);
-			outputStream.write("<end>\n".getBytes());
+			outputStream.write("<end>\n\0".getBytes());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -126,4 +136,3 @@ public class Message {
 		return res;
 	}
 }
-

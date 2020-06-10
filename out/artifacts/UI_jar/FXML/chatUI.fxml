@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXListView?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.ChatUIController">
+   <children>
+      <Pane prefHeight="700.0" prefWidth="322.0" style="-fx-background-color: #2D3447;">
+         <children>
+            <JFXListView fx:id="onlineList" layoutY="97.0" onMouseClicked="#handleMouseClickUser" prefHeight="262.0" prefWidth="322.0" style="-fx-background-color: #2D3459;" />
+            <Label layoutX="16.0" layoutY="-1.0" prefHeight="38.0" prefWidth="109.0" text="CHAT APP" textFill="WHITE">
+               <font>
+                  <Font name="Segoe UI Bold" size="20.0" />
+               </font>
+            </Label>
+            <JFXButton fx:id="addGroupBut" layoutX="198.0" layoutY="1.0" onAction="#addGroup" prefHeight="35.0" prefWidth="121.0" style="-fx-background-color: #316BF3;" text="Add Group" textFill="WHITE">
+               <font>
+                  <Font name="Segoe UI Bold" size="18.0" />
+               </font>
+            </JFXButton>
+            <Label fx:id="NameOfUser" layoutX="16.0" layoutY="37.0" prefHeight="30.0" prefWidth="276.0" text="User Name" textFill="#2ca3e5">
+               <font>
+                  <Font size="20.0" />
+               </font>
+            </Label>
+            <JFXListView fx:id="groupList" layoutY="385.0" onMouseClicked="#handleMouseClickGroup" prefHeight="315.0" prefWidth="322.0" style="-fx-background-color: #2D3459;" />
+            <Label layoutX="14.0" layoutY="76.0" prefHeight="21.0" prefWidth="109.0" text="Online User:" textFill="#2fea39">
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </Label>
+            <Label layoutX="14.0" layoutY="364.0" prefHeight="21.0" prefWidth="109.0" text="Group:" textFill="#2fea39">
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </Label>
+         </children></Pane>
+      <Pane fx:id="chatField" layoutX="323.0" layoutY="-1.0" prefHeight="663.0" prefWidth="678.0" style="-fx-background-color: #3D3B50;">
+         <children>
+            <Line endX="-20.0" endY="-116.0" layoutX="19.0" layoutY="116.0" startX="-20.0" startY="583.0" strokeWidth="3.0" />
+            <ScrollPane fx:id="scrollPane" accessibleRole="PARENT" hbarPolicy="NEVER" layoutX="1.0" layoutY="1.0" prefHeight="655.0" prefWidth="694.0" style="-fx-background-color: #3D3B50;" vvalue="1.0">
+               <content>
+                  <VBox fx:id="chatBox" alignment="TOP_RIGHT" prefHeight="660.0" prefWidth="675.0" style="-fx-background-color: #3D3B50;" />
+               </content>
+            </ScrollPane>
+         </children></Pane>
+      <Pane layoutX="323.0" layoutY="662.0" prefHeight="38.0" prefWidth="678.0" style="-fx-background-color: #2D3447;">
+         <children>
+            <ImageView fx:id="fileBut" fitHeight="40.0" fitWidth="30.0" layoutX="5.0" layoutY="4.0" onMouseClicked="#getFile" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../picture/attachment.png" />
+               </image>
+            </ImageView>
+            <ImageView fx:id="sendBut" fitHeight="35.0" fitWidth="28.0" layoutX="646.0" layoutY="4.0" onMouseClicked="#sendMess" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../picture/send.png" />
+               </image>
+            </ImageView>
+            <JFXTextField fx:id="textField" layoutX="39.0" onAction="#onEnter" prefHeight="38.0" prefWidth="600.0" promptText="Message" style="-fx-background-color: #FFFFFF;">
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </JFXTextField>
+         </children>
+      </Pane>
+   </children>
+</AnchorPane>

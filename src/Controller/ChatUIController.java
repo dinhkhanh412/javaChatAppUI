@@ -6,6 +6,7 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -17,7 +18,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -25,20 +28,20 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import java.io.File;
-import java.io.IOException;
+
+import java.io.*;
+
 import java.net.URL;
 import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.Socket;
 import java.io.IOException;
 
 
 public class ChatUIController extends ListView<String>  implements Runnable{
+    File file;
     SendThread sender;
     ReceiveThread receiver;
     String currentUser;
@@ -47,6 +50,7 @@ public class ChatUIController extends ListView<String>  implements Runnable{
     String filePath;
     String currentGr;
     FileChooser fileChooser;
+    boolean sendFile = false;
     boolean sendToGr = false;
     public ArrayList<ChatDialog> chatDialogs = new ArrayList<ChatDialog>();
     public ChatDialog currentDialog = null;
@@ -139,7 +143,7 @@ public class ChatUIController extends ListView<String>  implements Runnable{
 
     //TODO: Click to chat with other user
     @FXML
-    public void handleMouseClickUser(){
+    public void handleMouseClickUser() throws FileNotFoundException {
         sendToGr = false;
         String selectedUser = onlineList.getSelectionModel().getSelectedItem();
         for (ChatDialog chatDialog : chatDialogs) {
@@ -167,7 +171,7 @@ public class ChatUIController extends ListView<String>  implements Runnable{
 
     //TODO: Click to chat with other user
     @FXML
-    public void handleMouseClickGroup(){
+    public void handleMouseClickGroup() throws FileNotFoundException {
         sendToGr = true;
         String selectedGr = groupList.getSelectionModel().getSelectedItem();
         currentGr = selectedGr;
@@ -203,9 +207,50 @@ public class ChatUIController extends ListView<String>  implements Runnable{
         NameOfUser.setText(nameOfUser);
     }
 
-    //TODO: Send message if message field not empty
+    //TODO: A message to notice that a file was sent
+    public void UIFileSend(String fileName) throws FileNotFoundException {
+        Image image = new Image(new FileInputStream("/home/khanh/IdeaProjects/UI/src/Controller/file.png"));
+        ImageView imageView = new ImageView(image);
+        imageView.setFitHeight(30);
+        imageView.setFitWidth(30);
 
-    public void UISend(String message) {
+        Text text = new Text("  " + fileName);
+        text.setFill(Color.WHITE);
+        TextFlow tempFlow = new TextFlow();
+
+
+        text.setFont(Font.font("verdana", FontWeight.MEDIUM, FontPosture.REGULAR, 16));
+
+        tempFlow.setMaxWidth(300);
+        TextFlow flow=new TextFlow(tempFlow);
+
+        tempFlow.getStyleClass().add("tempFlow");
+        flow.getStyleClass().add("textFlow");
+        tempFlow.getChildren().add(imageView);
+        tempFlow.getChildren().add(text);
+
+
+        HBox root = new HBox();
+        root.getChildren().addAll(flow);
+        root.getStyleClass().add("hbox");
+        chatBox.setAlignment(Pos.TOP_RIGHT);
+        root.setAlignment(Pos.CENTER_RIGHT);
+        Platform.runLater(() -> chatBox.getChildren().addAll(root));
+
+
+    }
+
+
+    //TODO: Send message if message field not empty
+    public void UISend(String message) throws FileNotFoundException {
+        if (sendFile == true){
+            UIFileSend(file.getName());
+
+            sendFile = false;
+
+            return;
+        }
+
         if (!"".equals(message)){
             Text text = new Text(message);
             text.setFill(Color.WHITE);
@@ -228,6 +273,8 @@ public class ChatUIController extends ListView<String>  implements Runnable{
             hbox.getStyleClass().add("hbox");
             Platform.runLater(() -> chatBox.getChildren().addAll(hbox));
 
+            //UIFileSend("test");// test UI
+
             chatField.layout();
             scrollPane.setVvalue(chatBox.getHeight());
 
@@ -240,7 +287,7 @@ public class ChatUIController extends ListView<String>  implements Runnable{
             System.out.println("null message");//Use to check emty, delete it
         }
     }
-    public void sendMess(){
+    public void sendMess() throws FileNotFoundException {
         message = textField.getText();
         String recv;
         String msg = "";
@@ -266,8 +313,47 @@ public class ChatUIController extends ListView<String>  implements Runnable{
         textField.setText("");//set message field
     }
 
+    //TODO: A message to notice that a file was sent
+    public void UIFileReceive(String fileName) throws FileNotFoundException {
+        Image image = new Image(new FileInputStream("/home/khanh/IdeaProjects/UI/src/Controller/file.png"));
+        ImageView imageView = new ImageView(image);
+        imageView.setFitHeight(30);
+        imageView.setFitWidth(30);
+
+        Text text = new Text("  " + fileName);
+        text.setFill(Color.WHITE);
+        TextFlow tempFlow = new TextFlow();
+
+
+        text.setFont(Font.font("verdana", FontWeight.MEDIUM, FontPosture.REGULAR, 16));
+
+        tempFlow.setMaxWidth(300);
+        TextFlow flow = new TextFlow(tempFlow);
+
+        tempFlow.getStyleClass().add("tempFlowFlipped");
+        flow.getStyleClass().add("textFlowFlipped");
+        tempFlow.getChildren().add(imageView);
+        tempFlow.getChildren().add(text);
+
+
+        HBox root = new HBox();
+        root.getChildren().addAll(flow);
+        root.getStyleClass().add("hbox");
+        chatBox.setAlignment(Pos.TOP_LEFT);
+        root.setAlignment(Pos.CENTER_LEFT);
+        Platform.runLater(() -> chatBox.getChildren().addAll(root));
+
+        imageView.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+
+            public void handle(MouseEvent event) {
+                System.out.println("Tile pressed ");
+                event.consume();
+            }
+        });
+    }
+
     //TODO: Receive and message and update chatbox
-    public void UIrececive(String mess) {
+    public void UIrececive(String mess) throws FileNotFoundException {
         Text text = new Text(mess);
         text.setFill(Color.WHITE);
         text.setFont(Font.font("verdana", FontWeight.MEDIUM, FontPosture.REGULAR, 16));
@@ -289,10 +375,12 @@ public class ChatUIController extends ListView<String>  implements Runnable{
         hbox.getStyleClass().add("hbox");
         Platform.runLater(() -> chatBox.getChildren().addAll(hbox));
 
+
         chatField.layout();
         scrollPane.setVvalue(chatBox.getHeight());
     }
-    public void receiveMess(String mess, String person, boolean isGroup){
+
+    public void receiveMess(String mess, String person, boolean isGroup) throws FileNotFoundException {
         for (ChatDialog chatDialog : chatDialogs) {
             if (chatDialog.getName().equals(person)) {
                 chatDialog.addMess(person, mess);
@@ -308,9 +396,26 @@ public class ChatUIController extends ListView<String>  implements Runnable{
         Stage stage = new Stage();
         fileChooser = new FileChooser();
         fileChooser.setTitle("Open Resource File");
-        File file = fileChooser.showOpenDialog(stage);
+        file = fileChooser.showOpenDialog(stage);
         filePath = file.getPath();
-        textField.setText(file.getName());
+        try {
+            UISend("file: " + file.getName());
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        String recv;
+        if (sendToGr == true) {
+            recv = currentGr;
+        } else {
+            recv = currentReceiver;
+        }
+        try {
+            sender.loadFile(filePath, file.getName(), recv);
+            currentDialog.addMess(NameOfUser.getText(), "file: " + file.getName());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        sendFile = true;
     }
 
 

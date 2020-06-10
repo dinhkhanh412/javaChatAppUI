@@ -24,13 +24,49 @@ public class ReceiveThread implements Runnable {
 	public ReceiveThread(InputStream in, ChatClient client) {
 		this.inputStream = in;
 		this.client = client;
-		bf = new BufferedReader(new InputStreamReader(in));
+//		bf = new BufferedReader(new InputStreamReader(in));
 	}
-	
+
+	private byte[] data;
+
 	@Override 
 	public void run() {
+		while (client.getSocket().isConnected()) {
+			data = null;
+			try {
+				ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+
+				int count = 0;
+				int sumRead = 0;
+				byte[] data = new byte[1048576];
+				int tmp = 0;
+				while (inputStream.available() > 0) {
+					tmp = inputStream.read();
+					data[count] = (byte)tmp;
+					count+=1;
+				}
+				if (count == 0) continue;
+				buffer.write(data, 0, count);
+				System.out.println(count);
+				byte[] res = buffer.toByteArray();
+				handleData(res);
+				data = null;
+				buffer.flush();
+			} catch (IOException e) {
+				continue;
+			}
+
+		}
+	}
+
+	public void handleData(byte[] data) {
+		System.out.println(data.length);
 		String line, msg;
-		while (true) {
+		byte[] cloneData;
+		cloneData = data.clone();
+		InputStream is = new ByteArrayInputStream(data);
+		bf = new BufferedReader(new InputStreamReader(is));
+		if (!client.isLogin()) {
 			msg = "";
 			try {
 				if((line = bf.readLine()).equals("<start>")) {
@@ -39,21 +75,20 @@ public class ReceiveThread implements Runnable {
 					}
 					message = new Message(msg);
 					handleMsg(message);
-					if (client.isLogin()) break;
+					if (client.isLogin()) return;
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
-		while (client.isLogin()) {
-			if (client.hasDisconnected()) break;
+		else {
+			if (client.hasDisconnected()) return;
 			msg = "";
 			try {
 				while ((line = bf.readLine()) == null) ;
 				if(line.equals("<start>")) {
 					boolean isHeaderEnd = false;
 					boolean hasFile = false;
-					char[] fileContentChar = null;
 					byte[] fileContent = null;
 					try {
 						while (!((line = bf.readLine()).equals("<end>"))) {
@@ -66,11 +101,22 @@ public class ReceiveThread implements Runnable {
 								msg += line + "\n"; // length of file
 								line = bf.readLine();
 								msg += line + "\n"; // Name of file+
-								fileContentChar =  new char[length];
-								bf.read(fileContentChar);
-								fileContent = new String(fileContentChar).getBytes();
+
+								fileContent = new byte[(int) length];
+								int startPos = data.length - length - 8;
+								System.out.println(data.length);
+								for (int i = 0; i < length; i++) {
+									fileContent[i] = cloneData[startPos + i];
+								}
+								System.out.println(fileContent[0]);
+								try (FileOutputStream fout = new FileOutputStream("/home/khanh/Desktop/hello.png")) {
+									fout.write(fileContent, 0, fileContent.length);
+								}
+								break;
 							}
-							if (line == "\n") isHeaderEnd = true;
+							if (line.equals("")) {
+								isHeaderEnd = true;
+							}
 							if (fileContent == null) msg += line + "\n";
 						}
 					}
@@ -87,16 +133,14 @@ public class ReceiveThread implements Runnable {
 				client.disconnect();
 				return;
 			}
-
 		}
-
 	}
 	
 	public String getMsg() {
 		return msg;
 	}
 
-	public void handleMsg(Message msg) {
+	public void handleMsg(Message msg) throws FileNotFoundException {
 		if (msg.getMethod().equals("NOTI")){
 			if (message.getMethod().equals("NOTI")) {
 				if (message.getCommand().equals("200")) {
@@ -174,7 +218,7 @@ public class ReceiveThread implements Runnable {
 			if (msg.getCommand().equals("FILE")){
 				try {
 					byte[] fileContent = msg.getFileContent();
-					try (FileOutputStream fos = new FileOutputStream("/home/nguyendat/Documents/projects/ChatApp/src/client/hello.png")) {
+					try (FileOutputStream fos = new FileOutputStream("/home/khanh/Desktop/hello.png")) {
    						fos.write(fileContent);
 						System.out.println("[" + message.getSender() + "]: " + message.getBody());
    						fos.close(); 

@@ -47,19 +47,37 @@ public class SendThread implements Runnable {
 		System.out.println("asd");
 	}
 	
+//	public void send(String msg) throws IOException {
+//		msg = "<start>\n" + msg + "\n<end>\n";
+//		outputStream.write(msg.getBytes());
+//	}
+//
+//
+//
+//	public void sendFile(byte[] fileContent, String fileName, String receiver) throws IOException {
+//		String header = "<start>\n"+"SEND FILE\n" + this.client.getName() + " " + receiver + "\n\n" + Integer.toString(fileContent.length) +  "\n" + fileName +"\n";
+//		outputStream.write(header.getBytes());
+//		outputStream.write(fileContent);
+//		outputStream.write("\n<end>\n".getBytes());
+//		System.out.println("Write success");
+//	}
+
 	public void send(String msg) throws IOException {
-		msg = "<start>\n" + msg + "\n<end>\n"; 
+		msg = "<start>\n" + msg + "\n<end>\n\0";
 		outputStream.write(msg.getBytes());
 	}
 
-
-
 	public void sendFile(byte[] fileContent, String fileName, String receiver) throws IOException {
 		String header = "<start>\n"+"SEND FILE\n" + this.client.getName() + " " + receiver + "\n\n" + Integer.toString(fileContent.length) +  "\n" + fileName +"\n";
-		outputStream.write(header.getBytes());
-		outputStream.write(fileContent);
-		outputStream.write("\n<end>\n".getBytes());
-		System.out.println("Write success");
+		byte[] headerBytes = header.getBytes();
+		byte[] tailBytes = "\n<end>\n\0".getBytes();
+		ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream( );
+		byteOutputStream.write(headerBytes, 0, headerBytes.length);
+		byteOutputStream.write(fileContent);
+		byteOutputStream.write("\n<end>\n\0".getBytes());
+		byte[] c = byteOutputStream.toByteArray();
+		outputStream.write(c);
+		System.out.println("Exe this");
 	}
 	
 	public void sendRequest() {
@@ -126,6 +144,7 @@ public class SendThread implements Runnable {
 	}
 	
 	public void loadFile(String filePath, String fileName,String receiver) throws IOException {
+		System.out.println(filePath);
 		File file = new File(filePath);
         	FileInputStream fin = null;
 		byte fileContent[] = null;
@@ -135,7 +154,6 @@ public class SendThread implements Runnable {
 	         	fileContent = new byte[(int)file.length()];
         	 	   // Reads up to certain bytes of data from this input stream into an array of bytes.
            	 	fin.read(fileContent);
-				System.out.println(fileContent);
            	 	//create string from byte array
         	}
         	catch (FileNotFoundException e) {
